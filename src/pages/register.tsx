@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import validationSchema from "../validator/registerValidationSchema";
 import * as Yup from "yup";
 import axios from "axios";
+import Toast from "../components/toast";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const Register = () => {
   );
   const [register, setRegister] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,7 +36,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       const configuration = {
@@ -59,6 +61,16 @@ const Register = () => {
             setErrorMessage("Error registering user");
           }
           console.error(error);
+        })
+        .finally(() => {
+          setLoading(false);
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            address: "",
+            password: "",
+          });
         });
     } catch (err: any) {
       const validationErrors: { [key: string]: string } = {};
@@ -68,6 +80,7 @@ const Register = () => {
         }
       });
       setErrors(validationErrors);
+      setLoading(false);
     }
   };
 
@@ -107,7 +120,7 @@ const Register = () => {
                 type="text"
                 name="firstName"
                 id="first-name"
-                autoComplete="given-name"
+                value={formData.firstName}
                 className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 onChange={handleChange}
               />
@@ -130,7 +143,7 @@ const Register = () => {
                 type="text"
                 name="lastName"
                 id="last-name"
-                autoComplete="family-name"
+                value={formData.lastName}
                 className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 onChange={handleChange}
               />
@@ -152,7 +165,7 @@ const Register = () => {
                 type="email"
                 name="email"
                 id="email"
-                autoComplete="email"
+                value={formData.email}
                 className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 onChange={handleChange}
               />
@@ -174,6 +187,7 @@ const Register = () => {
               <input
                 name="address"
                 id="address"
+                value={formData.address}
                 className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 onChange={handleChange}
               />
@@ -192,6 +206,7 @@ const Register = () => {
                 type="password"
                 name="password"
                 id="password"
+                value={formData.password}
                 className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 onChange={handleChange}
               />
@@ -210,6 +225,7 @@ const Register = () => {
                 Login
               </a>
             </span>
+            <Toast message="Registration successfully completed." />
           </div>
         ) : (
           <div className="mt-4 text-grey-600">
@@ -229,9 +245,10 @@ const Register = () => {
         <div className="mt-10">
           <button
             type="submit"
+            disabled={loading}
             className="block w-full rounded-md bg-orange-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Register
+            {loading ? "Registering..." : "Register"}{" "}
           </button>
         </div>
       </form>
