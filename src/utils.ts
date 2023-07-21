@@ -4,12 +4,21 @@ interface User {
   email: string;
 }
 
-export function storeUserData(userData: User) {
+export function storeUserData(userData: User, token?: any) {
   try {
     const userDataJSON = JSON.stringify(userData);
     localStorage.setItem("user", userDataJSON);
+    localStorage.setItem("token", token);
   } catch (error) {
     console.error("Error storing user data in local storage:", error);
+  }
+}
+
+export function getToken() {
+  try {
+    return localStorage.getItem("token");
+  } catch (error) {
+    console.error("Error getting the token:", error);
   }
 }
 
@@ -29,6 +38,7 @@ export function getUserDataFromLocalStorage() {
 export function deleteUserData() {
   try {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   } catch (error) {
     console.error("Error deleting user data from local storage:", error);
   }

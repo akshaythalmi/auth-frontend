@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { userStore } from "../store/userStore";
 import updateProfilerValidationSchema from "../validator/updateProfileValidationSchema";
-import { storeUserData } from "../utils";
+import { getToken, storeUserData } from "../utils";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -14,6 +14,7 @@ const Profile = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const token = getToken();
 
   const handleChange = (e: any) => {
     setFormData({
@@ -39,13 +40,16 @@ const Profile = () => {
           email: userStore.user.email,
           address: formData.address || userStore.user.address,
         },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
 
       axios(configuration)
         .then((result) => {
           if (result.data.success) {
             userStore.user = result.data.user;
-            storeUserData(result.data.user);
+            storeUserData(result.data.user, token);
             navigate("/dashboard");
           }
         })

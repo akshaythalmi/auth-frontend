@@ -55,7 +55,7 @@ const Login = () => {
           if (result.data.token) {
             authState.isAuthenticated = true;
             userStore.user = result.data.user;
-            storeUserData(result.data.user);
+            storeUserData(result.data.user, result.data.token);
             navigate("/dashboard");
           }
         })
